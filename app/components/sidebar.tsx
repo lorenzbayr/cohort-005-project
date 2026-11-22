@@ -7,7 +7,6 @@ import { UserAvatar } from "~/components/user-avatar";
 import {
   NotificationsHeaderSlot,
   NotificationsNavSlot,
-  NotificationsFooterSlot,
 } from "~/components/notifications-prototype/notifications-prototype";
 import {
   BookOpen,
@@ -250,7 +249,6 @@ export function Sidebar({
                 {currentUser.role}
               </div>
             </div>
-            <NotificationsFooterSlot />
             <NavLink
               to="/settings"
               title="Settings"

@@ -1,10 +1,9 @@
 // PROTOTYPE — throwaway. "Prototype how notifications look and behave in the app"
 // (wayfinder ticket #7). Three structurally different variants mounted in the real
-// app layout, switchable via ?variant=A|B|C and the floating bar at the bottom:
+// app layout, switchable via ?variant=A|C and the floating bar at the bottom:
 //   A  Knock's prebuilt bell + popover (NotificationIconButton / NotificationFeedPopover),
 //      restyled with --rnf-* CSS variables, in the sidebar header.
-//   B  Headless (useKnockFeed) bell in the user row at the bottom of the sidebar,
-//      opening a compact shadcn-style dropdown.
+//   (B, a headless bell in the sidebar's user row, was dropped: too cluttered there.)
 //   C  Headless sidebar nav item "Notifications" with a count, linking to a full
 //      inbox page (/notifications-prototype), plus a toast when one arrives live.
 // Everything is wired to the live Knock `development` environment.
@@ -27,17 +26,15 @@ import {
 import type { FeedItem } from "@knocklabs/client";
 import "@knocklabs/react/dist/index.css";
 import "./knock-theme.css";
-import { Popover } from "radix-ui";
-import { Bell, BellDot, Check, CheckCheck, ChevronLeft, ChevronRight, Send } from "lucide-react";
+import { Bell, Check, CheckCheck, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "~/lib/utils";
 import { MOCK_MESSAGES, MOCK_MESSAGE_TYPES, type MockMessage } from "./mock-messages";
 
-export const VARIANTS = ["A", "B", "C"] as const;
+export const VARIANTS = ["A", "C"] as const;
 export type Variant = (typeof VARIANTS)[number];
 const VARIANT_NAMES: Record<Variant, string> = {
   A: "Prebuilt popover, sidebar header",
-  B: "Headless dropdown, user row",
   C: "Headless nav item + inbox page",
 };
 const STORAGE_KEY = "cadence-notifications-prototype-variant";
@@ -152,7 +149,7 @@ function useFeed() {
   return { feedClient, items, metadata, loading };
 }
 
-/** Only variant C toasts; A and B rely on the badge alone. */
+/** Only variant C toasts; A relies on the badge alone. */
 function LiveToasts() {
   const { feedClient } = useKnockFeed();
   const { variant } = useVariant();
@@ -240,18 +237,9 @@ export function NotificationsNavSlot() {
   return ready ? <VariantCNavItem /> : <VariantCNavItemView count={0} />;
 }
 
-/** User row at the bottom of the sidebar, beside Settings. Variant B. */
-export function NotificationsFooterSlot() {
-  const { variant } = useVariant();
-  const ready = useKnockReady();
-  if (variant !== "B") return null;
-  if (!ready) return <BellPlaceholder small />;
-  return <VariantB />;
-}
-
-function BellPlaceholder({ small }: { small?: boolean }) {
+function BellPlaceholder() {
   return (
-    <span className={cn("inline-flex items-center justify-center text-sidebar-foreground/40", small ? "p-1" : "size-8")}>
+    <span className="inline-flex size-8 items-center justify-center text-sidebar-foreground/40">
       <Bell className="size-4" />
     </span>
   );
@@ -279,87 +267,6 @@ function VariantA() {
         }}
       />
     </div>
-  );
-}
-
-// ---------------------------------------------------------------- Variant B
-
-function VariantB() {
-  const { feedClient, items, metadata } = useFeed();
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const unread = metadata.unread_count;
-
-  return (
-    <Popover.Root
-      open={open}
-      onOpenChange={(o) => {
-        setOpen(o);
-        if (o) feedClient.markAllAsSeen();
-      }}
-    >
-      <Popover.Trigger asChild>
-        <button
-          title="Notifications"
-          className="relative rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-        >
-          {unread > 0 ? <BellDot className="size-4" /> : <Bell className="size-4" />}
-          <CountBadge count={unread} className="absolute -right-1.5 -top-1.5" />
-        </button>
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          side="right"
-          align="end"
-          sideOffset={12}
-          className="z-50 w-80 rounded-lg border bg-popover text-popover-foreground shadow-lg"
-        >
-          <div className="flex items-center justify-between border-b px-3 py-2">
-            <span className="text-sm font-semibold">Notifications</span>
-            <button
-              disabled={unread === 0}
-              onClick={() => feedClient.markAllAsRead()}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground disabled:opacity-40"
-            >
-              <CheckCheck className="size-3.5" /> Mark all read
-            </button>
-          </div>
-          <ul className="max-h-96 overflow-y-auto">
-            {items.length === 0 && (
-              <li className="px-3 py-8 text-center text-sm text-muted-foreground">You're all caught up.</li>
-            )}
-            {items.slice(0, 8).map((item) => {
-              const m = messageOf(item);
-              const isUnread = !item.read_at;
-              return (
-                <li key={item.id}>
-                  <button
-                    onClick={() => {
-                      feedClient.markAsRead(item);
-                      setOpen(false);
-                      navigate(m.url);
-                    }}
-                    className={cn(
-                      "flex w-full gap-2 px-3 py-2 text-left transition-colors hover:bg-accent",
-                      isUnread && "bg-primary/5"
-                    )}
-                  >
-                    <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", isUnread ? "bg-primary" : "bg-transparent")} />
-                    <span className="min-w-0 flex-1">
-                      <span className={cn("block truncate text-sm", isUnread ? "font-semibold" : "font-medium text-muted-foreground")}>
-                        {m.title}
-                      </span>
-                      <span className="line-clamp-2 text-xs text-muted-foreground">{m.body}</span>
-                    </span>
-                    <span className="shrink-0 text-[10px] text-muted-foreground">{timeAgo(item.inserted_at)}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
   );
 }
 
