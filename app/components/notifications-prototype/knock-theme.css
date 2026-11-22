@@ -5,8 +5,8 @@
   --rnf-color-brand-500: var(--primary);
   --rnf-color-brand-700: var(--primary);
   --rnf-color-brand-900: var(--primary);
-  --rnf-unread-badge-bg-color: var(--primary);
-  --rnf-unseen-badge-bg-color: var(--primary);
+  --rnf-unread-badge-bg-color: #dc2626; /* red-600: unread count badge */
+  --rnf-unseen-badge-bg-color: #dc2626;
   --rnf-notification-cell-unread-dot-bg-color: var(--primary);
   --rnf-notification-cell-unread-dot-border-color: var(--primary);
   --rnf-notification-feed-popover-bg-color: var(--popover);
@@ -23,3 +23,6 @@
   --rnf-border-radius-lg: var(--radius);
 }
 .cadence-knock .rnf-notification-icon-button svg { color: var(--sidebar-foreground); opacity: 0.7; }
+/* Badge stays red with white digits in light and dark mode. */
+.rnf-unseen-badge, .rnf-unseen-badge--dark { --rnf-unseen-badge-bg-color: #dc2626; }
+.rnf-unseen-badge__count { color: #fff; }

@@ -212,7 +212,7 @@ function CountBadge({ count, className }: { count: number; className?: string })
   return (
     <span
       className={cn(
-        "inline-flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-4 text-primary-foreground",
+        "inline-flex min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold leading-4 text-white",
         className
       )}
     >
@@ -303,7 +303,7 @@ function VariantB() {
           title="Notifications"
           className="relative rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
         >
-          {unread > 0 ? <BellDot className="size-4 text-primary" /> : <Bell className="size-4" />}
+          {unread > 0 ? <BellDot className="size-4" /> : <Bell className="size-4" />}
           <CountBadge count={unread} className="absolute -right-1.5 -top-1.5" />
         </button>
       </Popover.Trigger>
