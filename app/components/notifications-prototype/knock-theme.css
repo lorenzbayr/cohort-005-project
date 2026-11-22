@@ -1,0 +1,25 @@
+/* PROTOTYPE — throwaway. Variant A: restyle Knock's prebuilt feed with Cadence's
+   shadcn theme tokens. Knock has no Tailwind classes, only --rnf-* variables. */
+:root:root {
+  --rnf-font-family-sanserif: var(--font-sans);
+  --rnf-color-brand-500: var(--primary);
+  --rnf-color-brand-700: var(--primary);
+  --rnf-color-brand-900: var(--primary);
+  --rnf-unread-badge-bg-color: var(--primary);
+  --rnf-unseen-badge-bg-color: var(--primary);
+  --rnf-notification-cell-unread-dot-bg-color: var(--primary);
+  --rnf-notification-cell-unread-dot-border-color: var(--primary);
+  --rnf-notification-feed-popover-bg-color: var(--popover);
+  --rnf-notification-feed-popover-border-radius: var(--radius);
+  --rnf-notification-feed-popover-z-index: 50;
+  --rnf-notification-cell-border-bottom-color: var(--border);
+  --rnf-message-cell-hover-bg-color: var(--accent);
+  --rnf-notification-cell-active-bg-color: var(--accent);
+  --rnf-notification-icon-button-bg-color: transparent;
+  --rnf-button-primary-bg-color: var(--primary);
+  --rnf-button-primary-border-color: var(--primary);
+  --rnf-button-primary-text-color: var(--primary-foreground);
+  --rnf-border-radius-md: calc(var(--radius) - 2px);
+  --rnf-border-radius-lg: var(--radius);
+}
+.cadence-knock .rnf-notification-icon-button svg { color: var(--sidebar-foreground); opacity: 0.7; }

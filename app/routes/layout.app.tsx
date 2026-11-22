@@ -4,6 +4,16 @@ import { Sidebar } from "~/components/sidebar";
 import { DevUI } from "~/components/dev-ui";
 import { Toaster } from "sonner";
 import { getCurrentUserId, getDevCountry } from "~/lib/session";
+// PROTOTYPE — throwaway (notifications UI, wayfinder ticket #7)
+import {
+  knockClientConfig,
+  knockUserId,
+  signKnockUserToken,
+} from "~/lib/notifications-prototype.server";
+import {
+  NotificationsPrototypeProvider,
+  PrototypeBar,
+} from "~/components/notifications-prototype/notifications-prototype";
 import { getCountryTierInfo, COUNTRIES } from "~/lib/ppp";
 import { eq, and, or, sql, desc } from "drizzle-orm";
 import { db } from "~/db";
@@ -213,6 +223,14 @@ export async function loader({ request }: Route.LoaderArgs) {
     countryTierInfo,
     countries: COUNTRIES,
     isTeamAdmin: currentUserId ? isTeamAdmin(currentUserId) : false,
+    // PROTOTYPE: signed per request, so it follows the DevUI user switch.
+    knock: currentUserId
+      ? {
+          ...knockClientConfig(),
+          userId: knockUserId(currentUserId),
+          userToken: await signKnockUserToken(currentUserId),
+        }
+      : null,
   };
 }
 
@@ -225,9 +243,11 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
     countryTierInfo,
     countries,
     isTeamAdmin: userIsTeamAdmin,
+    knock,
   } = loaderData;
 
   return (
+    <NotificationsPrototypeProvider knock={knock}>
     <div className="flex h-screen overflow-hidden">
       <Sidebar
         currentUser={currentUser}
@@ -245,6 +265,8 @@ export default function AppLayout({ loaderData }: Route.ComponentProps) {
         countries={countries}
       />
       <Toaster position="bottom-right" richColors closeButton />
+      <PrototypeBar users={users} currentUserId={currentUser?.id ?? null} />
     </div>
+    </NotificationsPrototypeProvider>
   );
 }
