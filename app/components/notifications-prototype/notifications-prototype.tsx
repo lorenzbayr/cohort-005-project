@@ -384,8 +384,10 @@ function VariantCNavItemView({ count }: { count: number }) {
       }
     >
       <Bell className="size-4" />
-      <span className="flex-1">Notifications</span>
-      <CountBadge count={count} />
+      <span className="flex items-center gap-1.5">
+        Notifications
+        <CountBadge count={count} />
+      </span>
     </NavLink>
   );
 }
